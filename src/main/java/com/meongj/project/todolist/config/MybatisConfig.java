@@ -19,11 +19,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
-import java.io.IOException;
 
 @EnableAsync
 @MapperScan(basePackages = "com.meongj.project.todolist.repository.**")
-@PropertySource("classpath:/application.properties")
+@PropertySource("classpath:/application.yml")
 @EnableTransactionManagement
 @Configuration
 public class MybatisConfig {
@@ -44,7 +43,7 @@ public class MybatisConfig {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setTypeAliasesPackage("com.meongj.project.todolist.model");
-        //sqlSessionFactoryBean.setConfigLocation(applicationContext.getResource("classpath:mybatis-config.xml"));
+        sqlSessionFactoryBean.setConfigLocation(applicationContext.getResource("classpath:mybatis-config.xml"));
         sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:mybatis/mapper/*.xml"));
 
         return sqlSessionFactoryBean.getObject();

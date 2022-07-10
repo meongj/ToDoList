@@ -21,7 +21,7 @@ public class TaskRepository {
     protected SqlSessionTemplate sqlSession;
 
     public List<TaskVO> getTaskList() throws Exception {
-        return sqlSession.selectList("TaskMapper.getTaskList");
+        return sqlSession.selectList("taskMapper.getTaskList");
     };
 
 }
