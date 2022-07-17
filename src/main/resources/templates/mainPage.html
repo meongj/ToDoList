@@ -12,6 +12,8 @@
 
     <!-- MDB -->
     <script src="/js/mdb.min.js" type="text/javascript"></script>
+    <script src="/js/mdb.min.js.map" type="text/javascript"></script>
+
     <!-- MDB -->
     <link href="/css/mdb.min.css" rel="stylesheet"/>
 
@@ -25,50 +27,10 @@
             href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
             rel="stylesheet"
     />
-
-
-    <script>
-        <!-- 엔터키입력시 등록하기 -->
-       /* function enter_check() {
-            if (event.keyCode == 13) {
-                alert("엔터키 누름");
-                todoAdd();
-                return;
-            }
-        }*/
-
-        <!-- 등록 모달생성 -->
-        function modalShow() {
-            $('#editModal').modal('show');
-        }
-
-        function todoAdd() {
-            alert("등록");
-            if($("#title").val() == "") {
-                alert("제목을 입력해주세요");
-                $("#title").focus();
-                return;
-            }
-
-            else {
-                $.ajax({
-                    type: "post",
-                    url: "/todolist/register",
-                    data: $("#frm").serialize(),
-                    success: function (data) {
-                        alert(data);
-                    },
-                    error: function () {
-                        alert("실패");
-                    }
-                });
-            }
-        }
-
-
-    </script>
+<script src="/js/main.js"></script>
 </head>
-<body onkeydown="enter_check();">
+<!--<body onkeydown="enter_check();">-->
+<body>
 <section class="vh-100" style="background-color: #eee;">
     <div class="container py-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
@@ -149,61 +111,66 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">할일 추가하기</h5>
-                <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-mdb-dismiss="modal" onclick="modalClose()"></button>
             </div>
             <div class="modal-body">
-                <div class="form-outline">
-
-                    <input type="text" id="title" name="title" class="form-control" />
+                <div>
                     <label class="form-label" for="title">할일</label>
+                    <input type="text" id="title" name="title" class="form-control" maxlength="35"/>
                 </div>
 
-                <div class="form-outline">
-                    <textarea class="form-control" id="content" name="content" rows="4"></textarea>
+                <div>
                     <label class="form-label" for="content">내용</label>
+                    <textarea class="form-control" id="content" name="content" rows="4" maxlength="120"></textarea>
                 </div>
-                <div class="form-outline">
-                #자바 #스프링 #공부하기<button type="button" class="btn btn-sm btn-info">#</button>
+                <div><br>
+                <!--  해쉬태그는 한줄로 가져간다
+                      버튼 누르면 자동 # input 추가
+                      결국 input 한줄로 가져가서 등록됨-->
+                    <label class="form-label" for="form12">태그 추가</label>
+                    <div class="row">
+                    <div class="col-sm-10"><input type="text" id="hashtag" name="hashtag" class="form-control" maxlength="45"/></div>
+                    <div class="col-sm-1"><button type="button" class="btn btn-info" onclick="hashTagAdd()"><i class="fas fa-hashtag"></i></button></div>
+                    </div>
+
                 </div>
                 <br>
-                <div class="row form-outline">
+                <div class="row">
                     <div class="col-md-5">
                         <label class="form-label">시작시간</label>
-                        <input type="time" class="form-control" id="deadline-date1" style="width: 130px"></div>
+                        <input type="time" class="form-control" id="start_time" name="start_time"></div>
                     <div class="col-md-2"></div>
                     <div class="col-md-5">
                         <label class="form-label" >종료시간</label>
-                        <input type="time" class="form-control" id="deadline-date2" style="width: 130px">
+                        <input type="time" class="form-control" id="end_time" name="end_time">
                     </div>
                 </div>
                 <br>
-                <div class="form-outline">
+                <div>
                     <label class="form-label">우선순위</label>
-                    <div class="row"><label>
-                    <div class="form-check col-sm-3">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
-                        <label class="form-check-label" for="inlineRadio1">High</label>
-                    </div>
-
-                    <div class="form-check col-sm-3">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2" />
-                        <label class="form-check-label" for="inlineRadio2">Medium</label>
-                    </div>
-
-                    <div class="form-check col-sm-3">
-                        <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3"  />
-                        <label class="form-check-label" for="inlineRadio3">Low</label>
-                    </div></label>
-                    </div>
-
                 </div>
+                <div class="col-sm-12 row">
+                    <div class="col-sm-3">
+                        <input class="form-check-input" type="radio" name="priorityRadio" id="priorityRadio1" value="High" />
+                        <label class="form-check-label" for="priorityRadio1">High</label>
+                    </div>
+                    <div class="col-sm-4">
+                        <input class="form-check-input" type="radio" name="priorityRadio" id="priorityRadio2" value="Medium" />
+                        <label class="form-check-label" for="priorityRadio2">Medium</label>
+                    </div>
+                    <div class="col-sm-3">
+                        <input class="form-check-input" type="radio" name="priorityRadio" id="priorityRadio3" value="Low" />
+                        <label class="form-check-label" for="priorityRadio3">Low</label>
+                    </div>
+                </div>
+                <br>
             <div class="modal-footer" align="center">
-                <button type="button" class="btn btn-primary">등록</button>
+                <button type="button" class="btn btn-primary" onclick="todoAdd()">등록</button>
             </div>
         </div>
     </div>
 </div><!--modal end-->
 </form>
 
-
 </body>
+</html>

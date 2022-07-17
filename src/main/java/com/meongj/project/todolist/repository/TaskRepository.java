@@ -24,4 +24,8 @@ public class TaskRepository {
         return sqlSession.selectList("taskMapper.getTaskList");
     };
 
+    public int addTask(TaskVO taskVO) throws Exception {
+        return sqlSession.insert("taskMapper.addTask", taskVO);
+    }
+
 }

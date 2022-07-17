@@ -5,12 +5,12 @@ import com.meongj.project.todolist.service.TaskService;
 import com.meongj.project.todolist.service.TaskServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -23,7 +23,7 @@ public class MainController {
     @RequestMapping("/")
     public ModelAndView mainPage() throws Exception {
         ModelAndView mv = new ModelAndView("mainPage.html");
-        System.out.println("main!!!");
+//        System.out.println("main!!!");
         List<TaskVO> arr = taskServiceImpl.getTaskList();
 //        for (TaskVO vo : arr){
 //            System.out.println(vo.getId());
@@ -38,12 +38,31 @@ public class MainController {
     }
 
 
-    @ResponseBody
     @PostMapping("/todolist/register")
-    public String register(TaskVO taskVO) {
+    public int register(@RequestBody TaskVO taskVO) throws Exception {
         System.out.println(taskVO.getTitle());
+        System.out.println(taskVO.getContent());
+        System.out.println(taskVO.getHashtag());
+        System.out.println(taskVO.getStartTime());
+        System.out.println(taskVO.getEndTime());
+        System.out.println(taskVO.getPriority());
 
+        //yyyy-mm-dd hh:mm:00 (hh:mm)
+        //오늘날찌
+        Date now = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        String today = simpleDateFormat.format(now);
+        System.out.println("today="+today);
+        String getStartTime  = taskVO.getStartTime().replace(":","");
+        String getEndTime = taskVO.getEndTime().replace(":","");
+        System.out.println(today.toString() + getStartTime + "00");
+        taskVO.setStartTime(today.toString() + getStartTime + "00");
+        taskVO.setEndTime(today.toString() + getEndTime + "00");
 
-        return "성공";
+        System.out.println(taskVO);
+        int insert_flag = taskServiceImpl.addTask(taskVO);
+        if (insert_flag == 1) log.info("INSERT TASK SUCCESS!!");
+
+        return insert_flag;
     }
 }

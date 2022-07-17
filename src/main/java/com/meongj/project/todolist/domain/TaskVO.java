@@ -12,8 +12,9 @@ public class TaskVO {
     private String content;
     private String hashtag;
     private int complete;
-    private Date date;
-    private Date startTime;
-    private Date endTime;
+    private String date;
+    private String startTime;
+    private String endTime;
     private String priority;
+
 }

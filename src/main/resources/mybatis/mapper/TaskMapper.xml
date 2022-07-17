@@ -5,7 +5,9 @@
         SELECT * FROM TASK
     </select>
 
-    <insert id="insertTask" parameterType="TaskVO">
-
+    <insert id="addTask" parameterType="TaskVO">
+        INSERT INTO TASK VALUES
+        ((SELECT ID_MAX FROM (SELECT IFNULL(MAX(ID)+1, 1) AS ID_MAX FROM TASK) A), #{title}, #{content}, #{hashtag}, 0, NOW(),
+         DATE_FORMAT(#{startTime}, "%Y-%m-%d %H:%i:%s"), DATE_FORMAT(#{endTime}, "%Y-%m-%d %H:%i:%s"), #{priority})
     </insert>
 </mapper>
