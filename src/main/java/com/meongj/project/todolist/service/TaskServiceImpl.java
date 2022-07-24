@@ -17,6 +17,11 @@ public class TaskServiceImpl implements TaskService {
 
 
     @Override
+    public int getTaskCnt() throws Exception {
+        return taskRepository.getTaskCnt();
+    }
+
+    @Override
     public List<TaskVO> getTaskList() throws Exception {
         return taskRepository.getTaskList();
     }

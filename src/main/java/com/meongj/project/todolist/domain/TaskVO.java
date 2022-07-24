@@ -16,5 +16,6 @@ public class TaskVO {
     private String startTime;
     private String endTime;
     private String priority;
+    private String leftTime; //남은 시간
 
 }

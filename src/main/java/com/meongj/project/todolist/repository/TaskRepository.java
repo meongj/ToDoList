@@ -20,6 +20,9 @@ public class TaskRepository {
     @Autowired
     protected SqlSessionTemplate sqlSession;
 
+    public int getTaskCnt() throws Exception {
+        return sqlSession.selectOne("taskMapper.getTaskCnt");
+    }
     public List<TaskVO> getTaskList() throws Exception {
         return sqlSession.selectList("taskMapper.getTaskList");
     };

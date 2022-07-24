@@ -31,18 +31,18 @@
 </head>
 <!--<body onkeydown="enter_check();">-->
 <body>
-<section class="vh-100" style="background-color: #eee;">
-    <div class="container py-5 h-100">
+<section style="background-color: #eee;">
+    <div class="container py-5 pl-5 pr-5 h-100">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-md-12 col-xl-10">
                 <div class="card">
                         <div class="card-head pt-5 pl-5 pr-5">
-                            <p class="mb-2"><span class="h3 me-2">2022년 07월 09일</span> <span
+                            <p class="mb-2"><span class="h3 me-2" th:text="${today}"></span> <span
                                     class="badge bg-danger">To-do-list</span></p>
-                            <p class="text-muted pb-2"><span class="h4">토요일</span></p>
+                            <p class="text-muted pb-2"><span class="h4" th:text="${dayOfWeek}"></span></p>
                             <br>
                             <div class="row">
-                                <div class="col-md-10" align="left"><p class="text-muted pb-2"><span class="h5">할일 n개 남음</span></p></div>
+                                <div class="col-md-10" align="left"><p class="text-muted pb-2"><span class="h5">할일 <span th:text="${taskTotal}"/>개 남음</span></p></div>
                                 <div class="col-md-2" align="right"><span>
                                 <button type="button" class="btn btn-outline-primary" data-mdb-toggle="modal" data-mdb-target="#editModal" onclick="modalShow()">
                                   Add
@@ -53,32 +53,40 @@
                     <!-- head end-->
                     <hr class="my-4">
                     <!--to-do list-->
-                    <div class="card-body" data-mdb-perfect-scrollbar="true" style="position: relative; height: 400px">
+                    <span th:if="${taskTotal} > 0">
+                    <div th:each="taskVO : ${taskList}"  class="card-body" data-mdb-perfect-scrollbar="true" style="position: relative; ">
                         <div class="card border border-info shadow-0 ">
                             <div class="card-header">
                                 <div class="list-group-item border-0 d-flex align-items-center ps-0">
                                     <div class="row col-lg-12">
-                                        <div class="col-lg-8">
-                                        <input class="form-check-input me-3" type="checkbox" value="" aria-label="..."/>
-                                        <s>자바 공부하기</s>
+                                        <div class="col-lg-9">
+                                        <input class="form-check-input me-3" type="checkbox" id="checkbox" value="" aria-label="..."/>
+<!--                                        <s th:text="${taskVO.title}"></s>-->
+                                            <label class="form-check-label" for="checkbox" th:text="${taskVO.title}"></label>
                                         </div>
-                                        <div class="col-lg-1"></div>
-                                        <div class="col-lg-2" align="right"><span>09:00 ~ 10:00</span></div>
-                                        <div class="col-lg-1"><h6 class="mb-0"><span class="badge rounded-pill bg-danger">High</span></h6>
+                                        <div class="col-lg-2" align="right"><span th:text="${taskVO.startTime}"></span> ~ <span th:text="${taskVO.endTime}"></span></div>
+<!--                                        우선 순위-->
+                                        <div class="col-lg-1">
+                                            <span th:if="${taskVO.priority} == 'High'">
+                                                 <h6 class="mb-0"><span class="badge rounded-pill bg-danger" th:text="${taskVO.priority}"></span></h6>
+                                            </span>
+                                            <span th:if="${taskVO.priority} == 'Medium'">
+                                                 <h6 class="mb-0"><span class="badge rounded-pill bg-warning" th:text="${taskVO.priority}"></span></h6>
+                                            </span>
+                                            <span th:if="${taskVO.priority} == 'Low'">
+                                                <h6 class="mb-0"><span class="badge rounded-pill bg-success" th:text="${taskVO.priority}"></span></h6>
+                                            </span>
                                     </div>
                                 </div>
                             </div>
                             </div>
                             <div class="card-body">
-                                <p class="card-text">
-                                    알고리즘 관련 공부하기
-                                </p>
-                                <p>#알고리즘 #자바 #해쉬태그예시</p>
-
+                                  <p class="card-text" th:utext="${#strings.replace(taskVO.content, nlString, '&lt;br /&gt;')}"></p>
+                                  <p th:text="${taskVO.hashtag}"></p>
                             </div>
                             <div class="card-footer">
                                 <div class="row">
-                                <div class="col-lg-10">
+                                <div class="col-lg-9">
                                 <!--수정-->
                                 <a class="btn btn-success" href="#!" role="button">
                                     <i class="fas fa-check"></i>
@@ -88,16 +96,15 @@
                                     <i class="fas fa-trash"></i>
                                 </a>
                                 </div>
-                                <div class="col-lg-2" align="right">
+                                <div class="col-lg-3" align="right">
                                 <!--남은 시간-->
-                                    <h5>1h 10min</h5>
+                                    <h5 class="text-muted"><span th:text="${taskVO.leftTime}"></span></h5>
                                 </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
-
+                    </span>
             </div>
         </div>
     </div>

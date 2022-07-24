@@ -72,9 +72,18 @@ function todoAdd() {
     var priority = $('input[name="priorityRadio"]:checked').val();
     if(priority == "undefined") priority = "";
     var content =  $('textarea[name="content"]').val();
-    if(content == "undefined") content = "";
+    if(content == "undefined") {
+        content = "";
+    }
+    else {
+        console.log("content="+content);
+        // 줄바꿈 저장
+        content = $('textarea[name="content"]').val().replace(/(?:\r\n|\r|\n)/g, '<br>');
+    }
     var hashtag =  $('input[name="hashtag"]').val();
     if(hashtag == "undefined") hashtag = "";
+
+
 
     var JSONObject = { 'title': title, 'content' : content, 'hashtag' : hashtag,
         'startTime': start_time , 'endTime' : end_time, 'priority' : priority };
