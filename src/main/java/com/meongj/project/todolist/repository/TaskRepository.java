@@ -31,4 +31,16 @@ public class TaskRepository {
         return sqlSession.insert("taskMapper.addTask", taskVO);
     }
 
+    public int deleteTask(TaskVO taskVO) throws Exception {
+        return sqlSession.delete("taskMapper.deleteTask", taskVO);
+    }
+
+    public int editTask(TaskVO taskVO) throws Exception {
+        return sqlSession.update("taskMapper.editTask", taskVO);
+    }
+
+    public int completeTask(TaskVO taskVO) throws Exception {
+        return sqlSession.update("taskMapper.completeTask", taskVO);
+    }
+
 }

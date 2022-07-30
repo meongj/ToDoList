@@ -14,4 +14,20 @@
         ((SELECT ID_MAX FROM (SELECT IFNULL(MAX(ID)+1, 1) AS ID_MAX FROM TASK) A), #{title}, #{content}, #{hashtag}, 0, NOW(),
          DATE_FORMAT(#{startTime}, "%Y-%m-%d %H:%i:%s"), DATE_FORMAT(#{endTime}, "%Y-%m-%d %H:%i:%s"), #{priority})
     </insert>
+
+    <delete id="deleteTask" parameterType="TaskVO">
+        DELETE FROM TASK WHERE TITLE = #{title}  AND ID = #{id}
+    </delete>
+
+    <update id="editTask" parameterType="TaskVO">
+        UPDATE TASK SET
+        TITLE = #{title} , CONTENT = #{content} , HASHTAG = #{hashtag}
+        , START_TIME = DATE_FORMAT(#{startTime}, "%Y-%m-%d %H:%i:%s") , END_TIME = DATE_FORMAT(#{endTime}, "%Y-%m-%d %H:%i:%s")
+        , PRIORITY = #{priority}
+        WHERE ID = #{id}
+    </update>
+
+    <update id="completeTask" parameterType="TaskVO">
+        UPDATE TASK SET COMPLETE = #{complete} WHERE ID = #{id}
+    </update>
 </mapper>

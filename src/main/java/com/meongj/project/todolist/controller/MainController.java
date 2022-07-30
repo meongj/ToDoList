@@ -2,13 +2,13 @@ package com.meongj.project.todolist.controller;
 
 import com.meongj.project.todolist.domain.TaskVO;
 import com.meongj.project.todolist.service.TaskServiceImpl;
+import com.meongj.project.todolist.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -20,6 +20,8 @@ public class MainController {
 
     @Autowired
     private TaskServiceImpl taskServiceImpl;
+    @Autowired
+    private CommonUtil comnUtil;
 
     @RequestMapping("/")
     public ModelAndView mainPage() throws Exception {
@@ -41,28 +43,36 @@ public class MainController {
             String startTime = taskList.get(i).getStartTime();
             String endTime = taskList.get(i).getEndTime();
 
-            taskList.get(i).setStartTime(startTime.substring(11, 16));
-            taskList.get(i).setEndTime(endTime.substring(11, 16));
+            String startTimeSplit = comnUtil.nullCheck(startTime.substring(11, 16));
+            String endTimeSplit = comnUtil.nullCheck(endTime.substring(11, 16));
+
+            // 오전, 오후 구분
+            if (Integer.parseInt(startTimeSplit.replace(":","")) < 1200) taskList.get(i).setStartTime(startTimeSplit + " am");
+            else taskList.get(i).setStartTime(startTimeSplit + " pm");
+
+            if (Integer.parseInt(endTimeSplit.replace(":","")) < 1200) taskList.get(i).setEndTime(endTimeSplit + " am");
+            else taskList.get(i).setEndTime(endTimeSplit + " pm");
+
 
             String todayDiff = now.format(formatter_today).toString();
-            System.out.println("가져온오늘날짜= "+ todayDiff);
-            System.out.println("가져온끝날짜=" + endTime);
+//            System.out.println("가져온오늘날짜= "+ todayDiff);
+//            System.out.println("가져온끝날짜=" + endTime);
            //Date format1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(startTime);
             Date endformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(endTime);
-            System.out.println("끝날짜="+ endformat);
+//            System.out.println("끝날짜="+ endformat);
             Date todayFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(todayDiff);
-            System.out.println("오늘=" + todayFormat);
+//            System.out.println("오늘=" + todayFormat);
 
             long diffMin = (endformat.getTime() - todayFormat.getTime()) / 60000; //분 차이
            // long diffHor = (format2.getTime() - format1.getTime()) / 3600000; //시 차이
-            System.out.println("분차이=" + diffMin);
+//            System.out.println("분차이=" + diffMin);
             StringBuffer leftTime = new StringBuffer();
             long hour = diffMin / 60;
             long min = diffMin % 60;
-            if(diffMin <= 0) {
-                leftTime.append("기한이 지난 할일 입니다.");
-            } else {
 
+            if(diffMin <= 0) {
+                leftTime.append("기한이 지난 할 일입니다.");
+            } else {
                 if (min == 0) leftTime.append(hour).append("h");
                 else {
                     if (hour == 0) leftTime.append(min % 60).append("min");
@@ -70,7 +80,16 @@ public class MainController {
                 }
             }
             System.out.println("leftTime=" + leftTime);
-            taskList.get(i).setLeftTime(leftTime.toString());
+            if (taskList.get(i).getComplete() == 1) {
+                taskList.get(i).setLeftTime("완료된 할 일입니다.");
+                taskList.get(i).setCheck("form-check-label text-decoration-line-through");
+                taskList.get(i).setColor("text-danger");
+            }
+            else {
+                taskList.get(i).setLeftTime(leftTime.toString());
+                taskList.get(i).setCheck("form-check-label");
+                taskList.get(i).setColor("text-muted");
+            }
 
         }
         // 줄바꿈
@@ -93,7 +112,9 @@ public class MainController {
         System.out.println(taskVO.getStartTime());
         System.out.println(taskVO.getEndTime());
         System.out.println(taskVO.getPriority());
-
+        System.out.println(taskVO.getFlag());
+        System.out.println("id="+taskVO.getId());
+        String flag = taskVO.getFlag();
         //yyyy-mm-dd hh:mm:00 (hh:mm)
         //오늘날찌
         Date now = new Date();
@@ -107,9 +128,38 @@ public class MainController {
         taskVO.setEndTime(today.toString() + getEndTime + "00");
 
         System.out.println(taskVO);
-        int insert_flag = taskServiceImpl.addTask(taskVO);
-        if (insert_flag == 1) log.info("INSERT TASK SUCCESS!!");
 
-        return insert_flag;
+        int result = 0;
+        if (flag.equals("add")) {
+            result = taskServiceImpl.addTask(taskVO);
+            if (result == 1) log.info("INSERT TASK SUCCESS!!");
+        } else if (flag.equals("edit")) {
+            result = taskServiceImpl.editTask(taskVO);
+            if (result== 1) log.info("UPDATE TASK SUCCESS!!");
+        }
+
+        return result;
     }
+
+    @PostMapping("/todolist/delete")
+    public int deleteTask(@RequestBody TaskVO taskVO) throws Exception {
+        System.out.println("삭제");
+        System.out.println(taskVO);
+        int deleteFlag = taskServiceImpl.deleteTask(taskVO);
+        System.out.println("delete="+deleteFlag);
+        if(deleteFlag == 1) log.info("DELETE TASK SUCCESS!!");
+
+        return deleteFlag;
+    }
+
+    // 할 일 완료된 것 체크저장
+    @PostMapping("/todolist/completeTask")
+    public int completeTask(@RequestBody TaskVO taskVO) throws Exception {
+        System.out.println("id="+taskVO.getId());
+        System.out.println("complete="+taskVO.getComplete());
+        int result= taskServiceImpl.completeTask(taskVO);
+        if (result == 1) log.info("CHECKBOX UPDATE SUCCESS");
+        return result;
+    }
+
 }

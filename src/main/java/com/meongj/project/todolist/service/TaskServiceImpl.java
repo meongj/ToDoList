@@ -30,4 +30,19 @@ public class TaskServiceImpl implements TaskService {
     public int addTask(TaskVO taskVO) throws Exception {
         return taskRepository.addTask(taskVO);
     }
+
+    @Override
+    public int deleteTask(TaskVO taskVO) throws Exception {
+        return taskRepository.deleteTask(taskVO);
+    }
+
+    @Override
+    public int editTask(TaskVO taskVO) throws Exception {
+        return taskRepository.editTask(taskVO);
+    }
+
+    @Override
+    public int completeTask(TaskVO taskVO) throws Exception {
+        return taskRepository.completeTask(taskVO);
+    }
 }

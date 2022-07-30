@@ -11,5 +11,11 @@ public interface TaskService {
     public List<TaskVO> getTaskList() throws Exception;
     //task 추가
     public int addTask(TaskVO taskVO) throws Exception;
+    //task 삭제
+    public int deleteTask(TaskVO taskVO) throws Exception;
+    //task 수정
+    public int editTask(TaskVO taskVO) throws Exception;
+    //할일 완료 체크
+    public int completeTask(TaskVO taskVO) throws Exception;
 
 }
