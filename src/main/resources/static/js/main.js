@@ -1,3 +1,56 @@
+$(document).ready(function() {
+    // content 글자수 체크
+    $('#content').on('keyup', function() {
+        var str_len = $(this).val().length;
+        var str = $(this).val();
+        var one_char = "";
+        var rbyte = 0;
+        for (var i = 0; i < str_len; i++) {
+            one_char = str.charAt(i);
+            if (escape(one_char).length === 6) {
+                rbyte += 2; //한글2Byte
+            } else {
+                rbyte++; //영문 등 나머지 1Byte
+            }
+        }///////
+
+        if(rbyte > 120) {
+            var splitStr= sliceByByte(str, 120);
+            $("#content").val(splitStr);
+            alert("내용은 120자 까지만 가능합니다");
+        }
+    });
+});
+
+// byte 수로 자르기
+function sliceByByte(str, maxByte) {
+
+    for(b=i=0;c=str.charCodeAt(i);) {
+        b+=c>>7?2:1;
+        if (b > maxByte)
+            break;
+        i++;
+    }
+
+    return str.substring(0,i);
+}
+
+// 드롭 다운 필터링 체크
+function filterEvent() {
+    var complete = $('select[name="complete"]').val();
+    var priority = $('select[name="priority"]').val();
+    var tagContent = $("input[name='tagContent']").val();
+
+    $.ajax({
+        type: "post",
+        url: "/todolist/filtering",
+        data: { complete : complete, priority : priority, hashTag : tagContent }
+    }).done(function (fragment) {
+        $("#contentId").replaceWith(fragment);
+    });
+}
+
+
 function checkboxChecked(index) {
         var complete = 0;
         var id = index.id;
@@ -23,7 +76,6 @@ function checkboxChecked(index) {
                 console.log("실패");
             }
         });
-    // });
 }
 
 
@@ -104,7 +156,6 @@ function todoAdd() {
         return;
     }
 
-
     if (hashStr.endsWith("#")) {
         alert("태그를 입력해주세요");
         $("#hashtag").focus();
@@ -178,7 +229,6 @@ function reviseModal(p_id, p_title, p_content, p_hashtag, p_start_time,
     $("#editId").val(p_id);
     $("#title").val(p_title);
 
-    console.log("p_content="+p_content);
     if( p_content == "" || p_content == null || p_content == undefined || ( p_content != null && typeof p_content == "object" && !Object.keys(p_content).length ) ) {
     }else{
         // 줄바꿈 저장

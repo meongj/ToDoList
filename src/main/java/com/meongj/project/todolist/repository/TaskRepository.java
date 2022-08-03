@@ -23,8 +23,8 @@ public class TaskRepository {
     public int getTaskCnt() throws Exception {
         return sqlSession.selectOne("taskMapper.getTaskCnt");
     }
-    public List<TaskVO> getTaskList() throws Exception {
-        return sqlSession.selectList("taskMapper.getTaskList");
+    public List<TaskVO> getTaskList(TaskVO taskVO) throws Exception {
+        return sqlSession.selectList("taskMapper.getTaskList", taskVO);
     };
 
     public int addTask(TaskVO taskVO) throws Exception {

@@ -5,8 +5,31 @@
         SELECT COUNT(*) FROM TASK WHERE DATE_FORMAT(DATE, "%Y-%m-%d") = CURDATE() AND COMPLETE = 0
     </select>
 
-    <select id="getTaskList" resultType="TaskVO">
-        SELECT * FROM TASK WHERE DATE_FORMAT(DATE, "%Y-%m-%d") = CURDATE() ORDER BY ID DESC
+    <select id="getTaskList" resultType="TaskVO" parameterType="TaskVO">
+        SELECT * FROM TASK
+        WHERE DATE_FORMAT(DATE, "%Y-%m-%d") = CURDATE()
+        <if test="complete != 3">
+        AND COMPLETE = #{complete}
+        </if>
+        <if test="hashtag != null and hashtag != ''">
+        AND HASHTAG LIKE CONCAT('%',#{hashtag},'%')
+        </if>
+            <if test="priority == 'asc'">
+                /* 시작 빠른 순*/
+                ORDER BY START_TIME ASC
+            </if>
+            /* 시작 느린 순*/
+            <if test="priority == 'desc'">
+                ORDER BY START_TIME DESC
+            </if>
+            /* 시작 우선순위 높은 or 낮은 순*/
+            <if test="priority == 'High'">
+                 ORDER BY FIELD (priority, 'High', 'Medium', 'Low')
+            </if>
+            <if test="priority == 'Low'">
+                ORDER BY FIELD (priority, 'Low', 'Medium', 'High')
+            </if>
+
     </select>
 
     <insert id="addTask" parameterType="TaskVO">

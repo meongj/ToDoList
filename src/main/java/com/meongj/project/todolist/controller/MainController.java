@@ -5,17 +5,23 @@ import com.meongj.project.todolist.service.TaskServiceImpl;
 import com.meongj.project.todolist.util.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@RestController
 @Slf4j
+@Controller
 public class MainController {
 
     @Autowired
@@ -24,9 +30,25 @@ public class MainController {
     private CommonUtil comnUtil;
 
     @RequestMapping("/")
-    public ModelAndView mainPage() throws Exception {
+    public ModelAndView mainPage(
+            @RequestParam(required = false) Integer complete,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) String hashtag
+            ) throws Exception {
         ModelAndView mv = new ModelAndView("index");
 
+       HashMap<String, Object> map  = taskProcessList(complete, priority, hashtag);
+
+        mv.addObject("today", map.get("today"));
+        mv.addObject("dayOfWeek", map.get("dayOfWeek"));
+        mv.addObject("taskTotal", map.get("taskTotal"));
+        mv.addObject("taskList" , map.get("taskList"));
+        mv.addObject("nlString", map.get("nlString"));
+        return mv;
+    }
+
+
+    public HashMap<String, Object> taskProcessList(Integer complete, String priority, String hashtag) throws Exception {
         // 오늘날짜 구하기
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
@@ -38,7 +60,16 @@ public class MainController {
         // 할일 리스트
         int taskTotal = taskServiceImpl.getTaskCnt();
 
-        List<TaskVO> taskList = taskServiceImpl.getTaskList();
+        TaskVO vo = new TaskVO();
+        // 정렬 param 셋팅
+        vo.setComplete((complete == null) ? 3 : complete); // default=3 (아무 선택 안 했을 경우)
+        vo.setPriority((priority == null) ? "asc" : priority);// 기본 빠른 시간순 default=asc
+        vo.setHashtag((hashtag == null) ? "" : hashtag); // 해쉬태그 검색시
+
+        log.info("[param] complete="+complete+" priority="+priority +" hashtag="+hashtag);
+
+        List<TaskVO> taskList = taskServiceImpl.getTaskList(vo);
+
         for (int i=0; i<taskList.size(); i++) {
             String startTime = taskList.get(i).getStartTime();
             String endTime = taskList.get(i).getEndTime();
@@ -53,19 +84,11 @@ public class MainController {
             if (Integer.parseInt(endTimeSplit.replace(":","")) < 1200) taskList.get(i).setEndTime(endTimeSplit + " am");
             else taskList.get(i).setEndTime(endTimeSplit + " pm");
 
-
             String todayDiff = now.format(formatter_today).toString();
-//            System.out.println("가져온오늘날짜= "+ todayDiff);
-//            System.out.println("가져온끝날짜=" + endTime);
-           //Date format1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(startTime);
             Date endformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(endTime);
-//            System.out.println("끝날짜="+ endformat);
             Date todayFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(todayDiff);
-//            System.out.println("오늘=" + todayFormat);
 
             long diffMin = (endformat.getTime() - todayFormat.getTime()) / 60000; //분 차이
-           // long diffHor = (format2.getTime() - format1.getTime()) / 3600000; //시 차이
-//            System.out.println("분차이=" + diffMin);
             StringBuffer leftTime = new StringBuffer();
             long hour = diffMin / 60;
             long min = diffMin % 60;
@@ -79,7 +102,7 @@ public class MainController {
                     else leftTime.append(hour).append("h ").append(min % 60).append("min");
                 }
             }
-            System.out.println("leftTime=" + leftTime);
+
             if (taskList.get(i).getComplete() == 1) {
                 taskList.get(i).setLeftTime("완료된 할 일입니다.");
                 taskList.get(i).setCheck("form-check-label text-decoration-line-through");
@@ -95,71 +118,34 @@ public class MainController {
         // 줄바꿈
         String nlString = System.getProperty("line.separator").toString();
 
-        mv.addObject("today", today);
-        mv.addObject("dayOfWeek", dayOfWeek);
-        mv.addObject("taskTotal", taskTotal);
-        mv.addObject("taskList" , taskList);
-        mv.addObject("nlString", nlString);
-        return mv;
+        HashMap<String, Object> map = new HashMap();
+        map.put("today", today);
+        map.put("dayOfWeek", dayOfWeek);
+        map.put("taskTotal", taskTotal);
+        map.put("taskList" , taskList);
+        map.put("nlString", nlString);
+
+        return  map;
+
     }
 
+    // 드롭다운 리스트 필터링 Ajax
+    // tag 검색, 정렬
+    @PostMapping("/todolist/filtering")
+    public String filtering(Model model,
+                            @RequestParam Map<String, Object> paramMap) throws Exception {
 
-    @PostMapping("/todolist/register")
-    public int register(@RequestBody TaskVO taskVO) throws Exception {
-        System.out.println(taskVO.getTitle());
-        System.out.println(taskVO.getContent());
-        System.out.println(taskVO.getHashtag());
-        System.out.println(taskVO.getStartTime());
-        System.out.println(taskVO.getEndTime());
-        System.out.println(taskVO.getPriority());
-        System.out.println(taskVO.getFlag());
-        System.out.println("id="+taskVO.getId());
-        String flag = taskVO.getFlag();
-        //yyyy-mm-dd hh:mm:00 (hh:mm)
-        //오늘날찌
-        Date now = new Date();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-        String today = simpleDateFormat.format(now);
-        System.out.println("today="+today);
-        String getStartTime  = taskVO.getStartTime().replace(":","");
-        String getEndTime = taskVO.getEndTime().replace(":","");
-        System.out.println(today.toString() + getStartTime + "00");
-        taskVO.setStartTime(today.toString() + getStartTime + "00");
-        taskVO.setEndTime(today.toString() + getEndTime + "00");
+        HashMap<String, Object> resultMap = taskProcessList
+                ( (Integer) Integer.parseInt(paramMap.get("complete").toString()),
+                (String) paramMap.get("priority"), (String)paramMap.get("hashTag"));
+        List<TaskVO> list = (List<TaskVO>) resultMap.get("taskList");
+        // 줄바꿈
+        String nlString = (String) resultMap.get("nlString");
 
-        System.out.println(taskVO);
+        model.addAttribute("taskList", list);
+        model.addAttribute("nlString", nlString);
 
-        int result = 0;
-        if (flag.equals("add")) {
-            result = taskServiceImpl.addTask(taskVO);
-            if (result == 1) log.info("INSERT TASK SUCCESS!!");
-        } else if (flag.equals("edit")) {
-            result = taskServiceImpl.editTask(taskVO);
-            if (result== 1) log.info("UPDATE TASK SUCCESS!!");
-        }
-
-        return result;
-    }
-
-    @PostMapping("/todolist/delete")
-    public int deleteTask(@RequestBody TaskVO taskVO) throws Exception {
-        System.out.println("삭제");
-        System.out.println(taskVO);
-        int deleteFlag = taskServiceImpl.deleteTask(taskVO);
-        System.out.println("delete="+deleteFlag);
-        if(deleteFlag == 1) log.info("DELETE TASK SUCCESS!!");
-
-        return deleteFlag;
-    }
-
-    // 할 일 완료된 것 체크저장
-    @PostMapping("/todolist/completeTask")
-    public int completeTask(@RequestBody TaskVO taskVO) throws Exception {
-        System.out.println("id="+taskVO.getId());
-        System.out.println("complete="+taskVO.getComplete());
-        int result= taskServiceImpl.completeTask(taskVO);
-        if (result == 1) log.info("CHECKBOX UPDATE SUCCESS");
-        return result;
+        return "index :: #contentId";
     }
 
 }
