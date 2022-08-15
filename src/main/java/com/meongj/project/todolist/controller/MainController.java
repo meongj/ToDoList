@@ -85,10 +85,12 @@ public class MainController {
             else taskList.get(i).setEndTime(endTimeSplit + " pm");
 
             String todayDiff = now.format(formatter_today).toString();
-            Date endformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(endTime);
-            Date todayFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(todayDiff);
+            Date endFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(endTime);
+            Date todayFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(todayDiff);
 
-            long diffMin = (endformat.getTime() - todayFormat.getTime()) / 60000; //분 차이
+            // getTime : ms 반환
+            long diffMin = (endFormat.getTime() - todayFormat.getTime()) / 60000; //분 차이
+
             StringBuffer leftTime = new StringBuffer();
             long hour = diffMin / 60;
             long min = diffMin % 60;

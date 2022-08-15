@@ -53,4 +53,16 @@
     <update id="completeTask" parameterType="TaskVO">
         UPDATE TASK SET COMPLETE = #{complete} WHERE ID = #{id}
     </update>
+
+    <!--1분 이내 미김 기한 지난 미완료된 데이터 조회-->
+    <select id="getOverDueTask" resultType="String">
+        <![CDATA[
+        SELECT title FROM task
+        where end_time <= now()
+        and   end_time > DATE_ADD(NOW(), INTERVAL -2 MINUTE)
+        and DATE_FORMAT(DATE, "%Y-%m-%d") = CURDATE()
+        and complete = 0
+        ORDER BY ID
+        ]]>
+    </select>
 </mapper>

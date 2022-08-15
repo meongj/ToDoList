@@ -20,5 +20,4 @@ public class TaskVO {
     private String flag; // 구분자
     private String check; // 체크여부
     private String color;
-
 }

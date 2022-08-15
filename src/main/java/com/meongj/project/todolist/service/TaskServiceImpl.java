@@ -45,4 +45,9 @@ public class TaskServiceImpl implements TaskService {
     public int completeTask(TaskVO taskVO) throws Exception {
         return taskRepository.completeTask(taskVO);
     }
+
+    @Override
+    public List<String> getOverDueTask() throws Exception {
+        return taskRepository.getOverDueTask();
+    }
 }

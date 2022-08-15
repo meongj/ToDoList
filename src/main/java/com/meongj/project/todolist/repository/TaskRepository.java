@@ -43,4 +43,8 @@ public class TaskRepository {
         return sqlSession.update("taskMapper.completeTask", taskVO);
     }
 
+    public List<String> getOverDueTask() throws Exception {
+        return sqlSession.selectList("taskMapper.getOverDueTask");
+    }
+
 }

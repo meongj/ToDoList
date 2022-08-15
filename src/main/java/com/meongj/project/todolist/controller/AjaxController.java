@@ -1,5 +1,6 @@
 package com.meongj.project.todolist.controller;
 
+import com.meongj.project.todolist.domain.OverDueDTO;
 import com.meongj.project.todolist.domain.TaskVO;
 import com.meongj.project.todolist.service.TaskServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -62,4 +64,23 @@ public class AjaxController {
         if (result == 1) log.info("CHECKBOX UPDATE SUCCESS");
         return result;
     }
+
+    @PostMapping("/overdueTask")
+    public OverDueDTO overdueTask() throws Exception {
+        OverDueDTO dto = new OverDueDTO();
+        // 시간 안에 미완료된 할일 개수
+        List<String> overDueTaskList = taskServiceImpl.getOverDueTask();
+        if (overDueTaskList.size() == 0) {
+            dto.setCount(0);
+            return dto;
+        }
+        dto.setCount(overDueTaskList.size());
+        // 할일 제목 저장
+        for (String title : overDueTaskList)
+            dto.setTitle(title);
+
+        log.info("시간 안에 미완료된 할일 개수 = " + dto.getCount());
+        return dto;
+    }
+
 }

@@ -17,5 +17,7 @@ public interface TaskService {
     public int editTask(TaskVO taskVO) throws Exception;
     //할일 완료 체크
     public int completeTask(TaskVO taskVO) throws Exception;
+    //완료하지 못한 task 알림
+    public List<String> getOverDueTask() throws Exception;
 
 }

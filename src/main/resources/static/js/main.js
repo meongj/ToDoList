@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
     // content 글자수 체크
     $('#content').on('keyup', function() {
         var str_len = $(this).val().length;
@@ -99,10 +100,12 @@ function modalShow(param) {
     $('#editModal').modal('show');
 }
 
-// 1분마다 리로드
+// 초, 분 마다 체크
 function timer() {
+    // 1분마다 체크
     setInterval(function() {
         $("#contentArr").load("/ #contentArr");
+        overdueTaskToast();
     }, 60000);
 }
 
@@ -278,3 +281,43 @@ function deleteTask(title, id) {
     }
 }
 
+// 종료 시간 넘은 할일 알림 메시지 toast
+function overdueTaskToast() {
+    $.ajax({
+        url : "/todolist/overdueTask",
+        method : "POST",
+        dataType: "json",
+        success : function (data) {
+            if (data.count == 0) return;
+            var toastTitle = '종료 시간이 지난 할 일이 ' + data.count + "개 있습니다." ;
+            var toastContent = '';
+            for (var i = 0; i < data.count-1; i++) {
+                toastContent += data.titles[i] + ', </br>';
+            }
+            toastContent += data.titles[i];
+
+            toastr.info(toastContent, toastTitle, {"iconClass": 'customer-info'});
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": false,
+                "positionClass": "toast-top-right",
+                "preventDuplicates": false,
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            }
+
+        },
+        error : function (error) {
+            console.log("error: " + error);
+        }
+    });
+}
