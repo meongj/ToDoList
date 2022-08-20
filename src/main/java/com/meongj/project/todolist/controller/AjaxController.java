@@ -53,7 +53,6 @@ public class AjaxController {
     public int deleteTask(@RequestBody TaskVO taskVO) throws Exception {
         int deleteFlag = taskServiceImpl.deleteTask(taskVO);
         if(deleteFlag == 1) log.info("DELETE TASK SUCCESS!!");
-
         return deleteFlag;
     }
 

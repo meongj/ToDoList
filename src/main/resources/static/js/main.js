@@ -254,7 +254,6 @@ function reviseModal(p_id, p_title, p_content, p_hashtag, p_start_time,
     }
 
     modalShow('revise');
-
 }
 
 

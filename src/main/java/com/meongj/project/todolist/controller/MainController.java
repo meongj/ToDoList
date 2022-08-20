@@ -128,7 +128,6 @@ public class MainController {
         map.put("nlString", nlString);
 
         return  map;
-
     }
 
     // 드롭다운 리스트 필터링 Ajax

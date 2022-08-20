@@ -19,5 +19,4 @@ public interface TaskService {
     public int completeTask(TaskVO taskVO) throws Exception;
     //완료하지 못한 task 알림
     public List<String> getOverDueTask() throws Exception;
-
 }
